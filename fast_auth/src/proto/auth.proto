@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+service AuthProto {
+  rpc CreateSession (SessionRequest) returns (SessionResponse) {}
+  rpc CreateCustomer (CustomerRequest) returns (CustomerResponse) {}
+  rpc AuthenticateCompany (AuthCompanyRequest) returns (AuthCompanyResponse) {}
+  rpc IntrospectToken (IntrospectRequest) returns (IntrospectResponse) {}
+}
+
+message SessionRequest {
+  string client_id = 1;
+  string client_secret = 2;
+  string return_url = 3;
+}
+
+message SessionResponse {
+  string expire_date = 1;
+  string session_id = 2;
+}
+
+message CustomerRequest {
+  string email = 1;
+  string username = 2;
+}
+
+message CustomerResponse {
+  string customer_uuid = 1;
+}
+
+message AuthCompanyRequest {
+  string client_id = 1;
+  string client_secret = 2;
+}
+
+message AuthCompanyResponse {
+  string client_id = 1;
+}
+
+message IntrospectRequest {
+  string client_id = 1;
+  string client_secret = 2;
+  string token = 3;
+}
+
+message IntrospectResponse {
+  string scope = 1;
+  bool revoked = 2;
+  int64 checked_at = 3;
+}
+
+
+// python3 -m grpc_tools.protoc -I./src/proto --python_out=./src/proto/compiled --pyi_out=./src/proto/compiled --grpc_python_out=./src/proto/compiled ./src/proto/auth.proto

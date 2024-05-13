@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+service PaymentsProto {
+  rpc CreateAccount (AccountRequest) returns (AccountResponse) {}
+  rpc CreateAccounting (AccountingRequest) returns (AccountResponse) {}
+  rpc ChargeAccount (ChargeRequest) returns (ChargeResponse) {}
+}
+
+message AccountRequest {
+  string client_id = 1;
+  string owner = 2;
+}
+
+message AccountResponse {
+  string account_number = 1;
+}
+
+message AccountingRequest {
+  string client_id = 1;
+  string email = 2;
+  string username = 3;
+}
+
+message ChargeRequest {
+  string client_id = 1;
+  string service_id = 2;
+  string account_number = 3;
+}
+
+message ChargeResponse {
+  string service_id = 1;
+  string service_name = 2;
+  string account_number = 3;
+  string invoice_number = 4;
+  int64 issued_at = 5;
+  float amount = 6;
+}
+
+
+// from src.proto.compiled import payments_pb2 as payments__pb2
+// python3 -m grpc_tools.protoc -I./src/proto --python_out=./src/proto/compiled --pyi_out=./src/proto/compiled --grpc_python_out=./src/proto/compiled ./src/proto/payments.proto

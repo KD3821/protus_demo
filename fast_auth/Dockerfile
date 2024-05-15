@@ -13,4 +13,3 @@ RUN pip install -r requirements.txt
 COPY src/ .
 
 EXPOSE 50051
-CMD [ "python", "-m", "src.proto.grpc_server" ]

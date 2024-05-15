@@ -14,6 +14,7 @@ from src.schemas.oauth.session import (LoginSessionRequest,
                                        LoginSessionResponse,
                                        OAuthCustomerLogin, StartedLoginSession)
 from src.settings import fast_gate_settings
+from src.logger import logger
 
 router = APIRouter(prefix="/oauth", tags=["OAuth"])
 
@@ -36,6 +37,8 @@ async def login_session(
         async with grpc.aio.insecure_channel(
             f"{fast_gate_settings.auth_host}:50051"
         ) as channel:
+            logger.info(f"gRPC Request 'CreateSession' with data: {data}")
+
             auth_stub = AuthProtoStub(channel)
             session_response = await auth_stub.CreateSession(
                 SessionRequest(

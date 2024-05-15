@@ -10,7 +10,16 @@ load_dotenv()
 DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_HOST = HOST = os.getenv("DB_HOST")
+DB_HOST = os.getenv("DB_HOST")
+UI_HOST = os.getenv("UI_HOST")
+UI_PORT = os.getenv("UI_PORT")
+MQ_HOST = os.getenv("MQ_HOST")
+CHANNELS_HOST = os.getenv("CHANNELS_HOST")
+PROTUS_API_HOST = os.getenv("PROTUS_API_HOST")
+PROTUS_API_PORT = os.getenv("PROTUS_API_PORT")
+PROTUS_UI_HOST = os.getenv("PROTUS_UI_HOST")
+PROTUS_UI_PORT = os.getenv("PROTUS_UI_PORT")
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -18,7 +27,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = os.getenv('DEBUG')
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -28,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'corsheaders',
+    'corsheaders',                     # noqa
     'rest_framework',
     'silk',
     'drf_spectacular',
@@ -39,7 +48,7 @@ INSTALLED_APPS = [
 
     'accounts',
     'service',
-    'protus',
+    'protus',                          # noqa
 ]
 
 SPECTACULAR_SETTINGS = {
@@ -98,7 +107,7 @@ DATABASES = {
         'USER': DB_USER,
         'PASSWORD': DB_PASSWORD,
         'HOST': DB_HOST,
-        'PORT': '5434',  # 5432 is taken by protus app
+        'PORT': '5432',
     }
 }
 
@@ -133,7 +142,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'error',
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'protus.auth.authentication.CustomAuthentication',
+        'protus.auth.authentication.CustomAuthentication',                         # noqa
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
@@ -143,21 +152,21 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 20
 }
 
-PROTUS = {
-    'PROTUS_HOST': os.getenv('PROTUS_HOST'),
-    'PROTUS_UI': os.getenv('PROTUS_UI'),
+PROTUS = {                                                         # noqa
+    'PROTUS_HOST': f"http://{PROTUS_API_HOST}:{PROTUS_API_PORT}",  # noqa
+    'PROTUS_UI': f"http://{PROTUS_UI_HOST}:{PROTUS_UI_PORT}",      # noqa
     'CLIENT_ID': os.getenv('CLIENT_ID'),
     'CLIENT_SECRET': os.getenv('CLIENT_SECRET'),
     'WEBHOOK_SECRET': os.getenv('WEBHOOK_SECRET'),
-    'SUCCESS_LOGIN_URL': os.getenv('SUCCESS_LOGIN_URL'),
+    'SUCCESS_LOGIN_URL': f"http://{UI_HOST}:{UI_PORT}/customers",  # noqa
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=1),
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(minutes=3),
     'DEFAULT_TOKEN_SCOPE': 'check hold charge',
 }
 
-CELERY_BROKER_URL = f'amqp://{HOST}:5672'  # 5672 is taken by protus app
+CELERY_BROKER_URL = f'amqp://{MQ_HOST}:5672'
 CELERY_RESULT_BACKEND = 'django-db'
-CELERY_RESULT_BACKEND_DB = f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5434/{DB_NAME}'  # 5432 is taken
+CELERY_RESULT_BACKEND_DB = f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -171,7 +180,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)]  # 6379 is taken
+            "hosts": [(f"{CHANNELS_HOST}", 6379)]
         }
     }
 }

@@ -16,6 +16,8 @@ from src.schemas.token import TokenIntrospect
 from src.services.company_service import CompanyAuthService
 from src.services.customer_service import CustomerAuthService
 from src.services.oauth_service import OAuthService
+from src.logger import logger
+from src.settings import fast_auth_settings
 
 
 class AuthProtoService(auth_pb2_grpc.AuthProtoServicer):
@@ -43,6 +45,9 @@ class AuthProtoService(auth_pb2_grpc.AuthProtoServicer):
     async def CreateSession(
         self, request: SessionRequest, context: grpc.aio.ServicerContext
     ) -> SessionResponse:
+        logger.info(
+            f"gRPC Request 'CreateSession' for CLIENT_ID: {request.client_id} | RETURN_URL: {request.return_url}"
+        )
 
         data = {
             "client_id": request.client_id,
@@ -104,7 +109,7 @@ class AuthProtoService(auth_pb2_grpc.AuthProtoServicer):
 async def serve() -> None:
     server = grpc.aio.server()
     auth_pb2_grpc.add_AuthProtoServicer_to_server(AuthProtoService(), server)
-    server.add_insecure_port("[::]:50051")
+    server.add_insecure_port(f"{fast_auth_settings.server_host}:50051")
     await server.start()
     await server.wait_for_termination()
 

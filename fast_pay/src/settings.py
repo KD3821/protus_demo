@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     amqp_dsn: AmqpDsn
     service_name: str = "payments"
     log_file: str = "payments.log"
+    demo_host: str
+    demo_port: int
 
 
 fast_pay_settings = Settings(_env_file=".env", _env_file_encoding="utf-8")

@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     amqp_dsn: AmqpDsn
     service_name: str = "auth"
     log_file: str = "auth.log"
+    demo_host: str
+    demo_port: int
 
 
 fast_auth_settings = Settings(_env_file=".env", _env_file_encoding="utf-8")

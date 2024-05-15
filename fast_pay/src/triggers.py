@@ -9,7 +9,7 @@ async def trigger_webhook(url, data, wh_secret, user_type):
             url=url,
             json=data if isinstance(data, dict) else data.model_dump(),
             headers={
-                "Authorization": wh_secret,  # TODO add WEBHOOK_SECRET field to Company model
+                "Authorization": wh_secret,
                 "User-Type": user_type,
             },
         )

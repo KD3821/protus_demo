@@ -122,7 +122,7 @@ class CampaignViewSet(ModelViewSet):
             for msg in msg_list:
                 schedule_message(msg.uuid)
 
-            protus_biller = PaymentProcessor(   # FIXME <INTEGRATION> Charge-Account performed (payload is optional arg)
+            protus_biller = PaymentProcessor(  # noqa FIXME <INTEGRATION> Charge-Account performed (payload is optional)
                 user_uuid=request.user.uuid,
                 service_id=os.getenv('LAUNCH_CAMPAIGN_SERVICE_ID'),
                 payload={
@@ -186,12 +186,12 @@ class CustomerViewSet(ModelViewSet):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
 
-        protus_biller = PaymentProcessor(  # FIXME <INTEGRATION> Charge-Account performed (payload is optional arg)
+        protus_biller = PaymentProcessor(  # noqa FIXME <INTEGRATION> Charge-Account performed (payload is optional arg)
             user_uuid=request.user.uuid,
             service_id=os.getenv('ADD_CUSTOMER_SERVICE_ID'),
             payload=serializer.data
         )
-        protus_biller.start()  # processing PROTUS payment
+        protus_biller.start()              # processing PROTUS payment
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 

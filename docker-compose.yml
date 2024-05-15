@@ -11,7 +11,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=messages_db
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - ./postgres_messages_data:/var/lib/postgresql/data
     ports:
       - "5434:5432"
     expose:
@@ -27,7 +27,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=fast_auth_db
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - ./postgres_auth_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     expose:
@@ -43,28 +43,29 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=fast_pay_db
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - ./postgres_pay_data:/var/lib/postgresql/data
     ports:
       - "5433:5432"
     expose:
       - 5432
-  backend_protus:
+  backend_protus_gate:
     container_name: backend_protus_gate
     restart: always
     build:
       context: ./fast_gate
       dockerfile: Dockerfile
-    image: protus_gateway_image
+    image: protus_gate_image
     volumes:
       - ./fast_gate:/app
-    command: uvicorn src.main:app --reload --host 0.0.0.0 --port 7077
+    command: uvicorn src.main:app --host 0.0.0.0 --port 7077
     env_file:
       - fast_gate/.env
     ports:
       - "7077:7077"
+    expose:
+      - 7077
     depends_on:
-      - db_messages
-      - broker
+      - celery-beat
   backend_protus_pay:
     container_name: backend_protus_pay
     restart: always
@@ -74,14 +75,16 @@ services:
     image: protus_pay_image
     volumes:
       - ./fast_pay:/app
-    command: uvicorn src.main:app --reload --host 0.0.0.0 --port 7000
+    command: uvicorn src.main:app --host 0.0.0.0 --port 7000
     env_file:
-      - fast_auth/.env
+      - fast_pay/.env
     ports:
       - "7000:7000"
+    expose:
+      - 7000
     depends_on:
       - db_pay
-      - broker
+      - celery-beat
   backend_protus_auth:
     container_name: backend_protus_auth
     restart: always
@@ -91,16 +94,18 @@ services:
     image: protus_auth_image
     volumes:
       - ./fast_auth:/app
-    command: uvicorn src.main:app --reload --host 0.0.0.0 --port 7070
+    command: uvicorn src.main:app --host 0.0.0.0 --port 7070
     env_file:
       - fast_auth/.env
     ports:
       - "7070:7070"
+    expose:
+      - 7070
     depends_on:
       - db_auth
-      - broker
-  backend_messages: &backend_messages
-    container_name: backend_messages
+      - celery-beat
+  backend-messages: &backend-messages
+    container_name: backend-messages
     restart: always
     build:
       context: ./messages_app
@@ -109,11 +114,13 @@ services:
     volumes:
       - ./messages_app:/code
       - static_volume:/code/static
-    command: uvicorn messages_app.asgi:application --reload --host 0.0.0.0 --port 8000
+    command: uvicorn messages_app.asgi:application --host 0.0.0.0 --port 8000
     env_file:
       - messages_app/.env
     ports:
       - "8000:8000"
+    expose:
+      - 8000
     depends_on:
       - db_messages
   frontend_messages:
@@ -130,8 +137,10 @@ services:
       - npm_config_unsafe_perm=true
     ports:
       - "8088:8088"
+    expose:
+      - 8088
     depends_on:
-      - backend_messages
+      - backend-messages
       - db_messages
   frontend_protus:
     container_name: frontend_protus
@@ -147,8 +156,10 @@ services:
       - npm_config_unsafe_perm=true
     ports:
       - "8080:8080"
+    expose:
+      - 8080
     depends_on:
-      - backend_protus
+      - backend_protus_gate
       - db_auth
       - db_pay
   nginx:
@@ -163,9 +174,9 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - backend_messages
+      - backend-messages
       - frontend_messages
-      - backend_protus
+      - backend_protus_gate
       - backend_protus_auth
       - backend_protus_pay
       - frontend_protus
@@ -191,9 +202,9 @@ services:
       - -c
       - "redis-server"
     depends_on:
-      - backend_messages
+      - backend-messages
   celery:
-    <<: *backend_messages
+    <<: *backend-messages
     container_name: messages_celery
     command:
       - /bin/sh
@@ -203,10 +214,10 @@ services:
       - ./messages_app:/code
     ports: []
     depends_on:
-      - backend_messages
+      - backend-messages
       - broker
   celery-beat:
-    <<: *backend_messages
+    <<: *backend-messages
     container_name: messages_celery_beat
     command:
       - /bin/sh
@@ -216,10 +227,9 @@ services:
       - ./messages_app:/code
     ports: []
     depends_on:
-      - backend_messages
+      - backend-messages
       - broker
       - celery
 
 volumes:
-  postgres_data:
   static_volume:

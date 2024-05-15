@@ -21,10 +21,6 @@ from src.services import AuthService
 from src.settings import fast_auth_settings
 from src.triggers import trigger_webhook
 
-PAYMENTS_HOST = fast_auth_settings.payments_host
-PAYMENTS_PORT = fast_auth_settings.payments_port
-API_KEY = fast_auth_settings.api_key
-
 
 class OAuthService(AuthService):
 
@@ -220,7 +216,7 @@ class OAuthService(AuthService):
         }
 
         res = await trigger_webhook(
-            url=company.wh_url,
+            url=f"http://{fast_auth_settings.demo_host}:{fast_auth_settings.demo_port}{company.wh_url}",  # company.wh_url
             data=webhook_data,
             wh_secret=company.wh_secret,
             user_type="oauth-access",

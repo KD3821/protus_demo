@@ -40,6 +40,7 @@ class ProviderService:
         return res.scalar()
 
     async def get_info(self, client_id: str) -> dict:
+
         provider = await self.get_provider(client_id)
 
         accounts = await self.get_accounts(client_id)

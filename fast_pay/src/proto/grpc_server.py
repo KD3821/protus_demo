@@ -11,6 +11,7 @@ from src.schemas.account import AccountCreate, AccountingCreate
 from src.schemas.invoice import InvoiceCreate
 from src.services.accounting import AccountService
 from src.services.billing import BillingService
+from src.settings import fast_pay_settings
 
 
 class PaymentsProtoService(payments_pb2_grpc.PaymentsProtoServicer):
@@ -76,7 +77,7 @@ async def serve() -> None:
         PaymentsProtoService(), server
     )
     server.add_insecure_port(
-        "[::]:50052"
+        f"{fast_pay_settings.server_host}:50052"
     )  # change from 50051: taken by auth_grpc_server
     await server.start()
     await server.wait_for_termination()

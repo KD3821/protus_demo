@@ -12,9 +12,16 @@ from src.middleware import logging_middleware
 from src.settings import fast_gate_settings
 
 
+async def delay(coro, seconds):  # custom coroutine wrapper
+    await asyncio.sleep(seconds)
+    await coro
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await asyncio.create_task(broker_handler.connect())
+    await asyncio.create_task(
+        delay(broker_handler.connect(), 30)  # waiting when broker is ready to accept
+    )
     yield
 
 

@@ -13,6 +13,7 @@ from src.schemas.account import Account
 from src.schemas.invoice import Invoice, InvoiceUpdate
 from src.schemas.wallet import Wallet, WalletByBroker, WalletCreate
 from src.triggers import trigger_webhook
+from src.settings import fast_pay_settings
 
 
 class WalletCallbackHandler:
@@ -85,7 +86,7 @@ class WalletCallbackHandler:
             await self.session.commit()
 
         res = await trigger_webhook(
-            url=account.provider.wh_url,
+            url=f"http://{fast_pay_settings.demo_host}:{fast_pay_settings.demo_port}{account.provider.wh_url}",  # account.provider.wh_url
             data={
                 "invoice_number": invoice_number,
                 "reference_code": reference_code,
@@ -96,7 +97,7 @@ class WalletCallbackHandler:
             user_type="payment-final",
         )
 
-        if res.status_code == 200:
+        if res.status_code == 200:   # TODO need to add Task for handling other responses and repeat trigger_webhook
             await self.finalize_invoice(invoice_number, reference_code, now)
             logger.info(
                 f"PROTUS-CLI: Invoice finalized * "

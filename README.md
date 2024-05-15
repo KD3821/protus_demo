@@ -52,15 +52,15 @@ MIRO: https://miro.com/app/board/uXjVKOFkZtk=/?share_link_id=649411215399
 Команды для запуска: docker-compose up -d --build
 
 в контейнере backend_protus_pay ( sudo docker exec -it backend_protus_pay /bin/bash -c "su - root" )
-cd /app/src/
-alembic revision --autogenerate -m "initial on build"
-alembic upgrade head
-python -m proto.grpc_server &
+<p>cd /app/src/</p>
+<p>alembic revision --autogenerate -m "initial on build"</p>
+<p>alembic upgrade head</p>
+<p>python -m proto.grpc_server &</p>
 
 
 
 в контейнере backend_protus_auth ( sudo docker exec -it backend_protus_auth /bin/bash -c "su - root" )
-cd /app/src/
-alembic revision --autogenerate -m "initial on build"
-alembic upgrade head
-python -m proto.grpc_server &
+<p>cd /app/src/</p>
+<p>alembic revision --autogenerate -m "initial on build"</p>
+<p>alembic upgrade head</p>
+<p>python -m proto.grpc_server &</p>

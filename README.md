@@ -5,7 +5,7 @@
 
 <p align="center"><img src="https://github.com/kd3821/protus_demo/blob/main/img/pic1.jpeg?raw=true"></p>
 
-Функционал PROTUS:
+<p align="center">Функционал:</p>
 
 Для Пользователя PROTUS:
 <ul>
@@ -75,21 +75,20 @@ MIRO: https://miro.com/app/board/uXjVKOFkZtk=/?share_link_id=649411215399
 Запустите команду в консоли: docker-compose -f docker-compose.yml up --build (дождитесь завершения сборки сети контейнеров).</li>
 <li>
 Если по какой-то причине процесс остановился с ошибкой - вызовите команду из консоли: docker-compose down и дождитесь остановки. Затем повторите предыдущий шаг.</li>
-<li>
 </ul>
 <br>
-Для Django приложения: войдите в контейнер backend-messages ( sudo docker exec -it backend-messages /bin/bash -c "su - root" ) и выполнить:
+<p>Для Django приложения: войдите в контейнер backend-messages<br>( sudo docker exec -it backend-messages /bin/bash -c "su - root" )<br>и выполнить:</p>
 <p>cd /code/</p>
 <p>python manage.py createsuperuser</p>
 <p>авторизуйтесь в Django Admin ( http://127.0.0.1:8000/admin ) и установите 'IntervalSchedule' для Celery Beat: 5, 10, 30 секунд (три интервала) - подробности работы django-приложения см. <a href="https://github.com/KD3821/message_service" target="_blank">тут</a></p><br>
 
-Для Payments приложения: войти в контейнер backend_protus_pay ( sudo docker exec -it backend_protus_pay /bin/bash -c "su - root" ) и выполнить:
+<p>Для Payments приложения: войти в контейнер backend_protus_pay<br>( sudo docker exec -it backend_protus_pay /bin/bash -c "su - root" )<br>и выполнить:</p>
 <p>cd /app/src/</p>
 <p>alembic revision --autogenerate -m "initial on build"  (создаем миграции и таблицы БД)</p>
 <p>alembic upgrade head</p>
 <p>python -m proto.grpc_server &  (запускаем gRPC сервер)</p><br>
 
-Для Auth приложения: войти в контейнер backend_protus_auth ( sudo docker exec -it backend_protus_auth /bin/bash -c "su - root" ) и выполнить:
+<p>Для Auth приложения: войти в контейнер backend_protus_auth ( sudo docker exec -it backend_protus_auth /bin/bash -c "su - root" )<br>и выполнить:</p>
 <p>cd /app/src/</p>
 <p>alembic revision --autogenerate -m "initial on build"  (создаем миграции и таблицы БД)</p>
 <p>alembic upgrade head</p>
